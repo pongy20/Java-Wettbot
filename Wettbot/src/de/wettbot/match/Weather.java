@@ -2,6 +2,9 @@ package de.wettbot.match;
 
 public enum Weather {
 
-	GOOD,
-	BAD
+	SUNNY,
+	CLOUDY,
+	RAINY,
+	STORMY,
+	SNOWY
 }
