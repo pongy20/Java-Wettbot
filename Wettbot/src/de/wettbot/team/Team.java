@@ -5,6 +5,5 @@ import de.wettbot.league.Competition;
 public class Team {
 
 	private String name;
-	private Competition league;
 	
 }
