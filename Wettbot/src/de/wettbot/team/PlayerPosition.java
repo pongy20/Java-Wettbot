@@ -2,5 +2,10 @@ package de.wettbot.team;
 
 public enum PlayerPosition {
 
-	GOALKEEPER
+	GOALKEEPER,
+	DEFENDER,
+	MIDFIELD,
+	OFFENSIVE_MIDFIELD,
+	WINGER,
+	ATTACKER
 }
