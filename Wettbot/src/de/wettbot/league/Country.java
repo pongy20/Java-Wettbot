@@ -2,6 +2,10 @@ package de.wettbot.league;
 
 public enum Country {
 
-	GERMANY
+	GERMANY,
+	ITALY,
+	ENGLAND,
+	SPAIN,
+	FRANCE
 	
 }
