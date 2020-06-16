@@ -1,6 +1,6 @@
 package de.wettbot.league;
 
-public class League {
+public class Competition {
 
 	private String name;
 	private Country country;
