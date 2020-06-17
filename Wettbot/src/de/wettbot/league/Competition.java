@@ -9,4 +9,8 @@ public class Competition {
 	private String name;
 	private Country country;
 	private List<Team> teams;
+	
+	public Competition() {
+		
+	}
 }
