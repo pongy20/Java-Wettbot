@@ -17,13 +17,16 @@ public class Berechnung {
 	static ArrayList<Match> matchList = new ArrayList<Match>();
 	
 	public static void main(String[] args) throws MalformedURLException {
-		String s = "https://www.fussballdaten.de/bundesliga/2019/";
-		for(int i = 1; i < 2; i++) {
-			s = s + i + "/";
-			URL url = new URL(s);
-			readDataFromHTML(url);
-		}
-		File f = new File("src/SoccerDataAllWorldCups.csv");
+//		for(int j = 0; j < 19; j++) {
+			for(int i = 1; i < 35; i++) {
+				String s = "https://www.fussballdaten.de/bundesliga/2019/";
+				s = s + i + "/";
+				URL url = new URL(s);
+				readDataFromHTML(url);
+			}
+//		}
+		
+//		File f = new File("src/SoccerDataAllWorldCups.csv");
 		
 //		readDataFromCSV(f);
 		
@@ -113,14 +116,14 @@ public class Berechnung {
 //						Torschuetze herausfiltern
 						if(teile[i].contains("<div class=\"text-right")) {
 							if(teile[i+1].contains("/person/")) {
-								line = teile[i+1].substring(teile[i+1].indexOf("/person/") + 8, teile[i+1].indexOf("/2019"));
+								line = teile[i+1].substring(teile[i+1].indexOf("/person/") + 8, teile[i+1].indexOf("/20"));
 								String[] name = line.split("-");
 								player = new Player(name[0], name[1], home);
 								System.out.println("Name: " + name[0] + " " + name[1]);
 							}
 						} else if(teile[i].contains("<div class=\"text-left")) {
 							if(teile[i+1].contains("/person/")) {
-								line = teile[i+1].substring(teile[i+1].indexOf("/person/") + 8, teile[i+1].lastIndexOf("/2019"));
+								line = teile[i+1].substring(teile[i+1].indexOf("/person/") + 8, teile[i+1].lastIndexOf("/20"));
 								String[] name = line.split("-");
 								player = new Player(name[0], name[1], away);
 								System.out.println("Name: " + name[0] + " " + name[1]);
