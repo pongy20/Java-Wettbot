@@ -10,7 +10,6 @@ import de.wettbot.league.Competition;
 import de.wettbot.location.Stadium;
 import de.wettbot.match.Weather;
 import de.wettbot.team.Card;
-import de.wettbot.team.Player;
 
 public class Match {
 
@@ -29,7 +28,7 @@ public class Match {
 	 * @param Player Torschuetze, List<Integer> Minuten
 	 */
 	private	SortedMap<Player, List<Integer>> goalgetter;
-	
+	private List<Integer> goalMinutes; 
 	private	SortedMap<Player, Card> playerCards;
 	
 	public Match(Team homeTeam, Team awayTeam, Stadium stadium, Date date) {
@@ -38,19 +37,14 @@ public class Match {
 		this.stadium = stadium;
 		this.date = date;
 		goalgetter = new TreeMap<Player, List<Integer>>();
+		goalMinutes = new ArrayList<Integer>();
 		playerCards = new TreeMap<Player, Card>();
 		this.homeGoals = 0; this.awayGoals = 0;
 	}
 
 	public void addGoalgetter(Player player, int minute) {
-		if (goalgetter.containsKey(player))
-			goalgetter.get(player).add(minute);
-		else {
-			List<Integer> liste = new ArrayList<Integer>();
-			liste.add(minute);
-			goalgetter.put(player, liste);
-		}
-			
+		goalMinutes.add(minute);
+		goalgetter.put(player, goalMinutes);	
 	}
 	public void addCard(Player player, Card c) {
 		if (playerCards.containsKey(player))
@@ -154,6 +148,14 @@ public class Match {
 
 	public void setCompetition(Competition liga) {
 		this.liga = liga;
+	}
+
+	public List<Integer> getGoalMinutes() {
+		return goalMinutes;
+	}
+
+	public void setGoalMinutes(List<Integer> goalMinutes) {
+		this.goalMinutes = goalMinutes;
 	}
 	
 }
