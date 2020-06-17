@@ -29,7 +29,7 @@ public class Berechnung {
 		
 		System.out.println("Unentschieden insgesamt: " + getRemis());
 		System.out.println("Spiele insgesamt: " + getGames());
-		System.out.printf("Wahrscheinlichkeit fï¿½r ein Unentschieden insgesamt: %.2f\n", getProbability(getRemis(), getGames()));
+		System.out.printf("Wahrscheinlichkeit für ein Unentschieden insgesamt: %.2f\n", getProbability(getRemis(), getGames()));
 //		System.out.println("Unentschieden der Mannschaft 'FRANCE': " + getRemis("France"));
 //		System.out.println("Anzahl der Spiele der Mannschaft 'FRANCE': " + getGames("France"));
 //		System.out.printf("Wahrscheinlichkeit fï¿½r ein Unentschieden bei 'FRANCE': %.2f\n", getProbability(getRemis("France"), getGames("France")));
@@ -100,6 +100,7 @@ public class Berechnung {
 							home = new Team(s[0]);
 							away = new Team(s[1]);
 							match = new Match(home, away, null, date);
+							matchList.add(match);
 						}
 						
 //						Datum des Spieltages herausfiltern
@@ -134,7 +135,6 @@ public class Berechnung {
 							}
 						}
 					}
-					matchList.add(match);
 				}
 			}
 			
