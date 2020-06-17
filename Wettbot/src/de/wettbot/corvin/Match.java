@@ -3,6 +3,7 @@ package de.wettbot.corvin;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -18,9 +19,7 @@ public class Match {
 	private Stadium stadium;
 	private Weather weather;
 	private Date date;
-	
-	private int homeGoals;
-	private int awayGoals;
+
 	private Competition liga;
 	
 
@@ -39,7 +38,6 @@ public class Match {
 		goalgetter = new TreeMap<Player, List<Integer>>();
 		goalMinutes = new ArrayList<Integer>();
 		playerCards = new TreeMap<Player, Card>();
-		this.homeGoals = 0; this.awayGoals = 0;
 	}
 
 	public void addGoalgetter(Player player, int minute) {
@@ -57,19 +55,23 @@ public class Match {
 	}
 	
 	public int getHomeGoals() {
+		int homeGoals = 0;
+		for (Map.Entry<Player, List<Integer>> map : goalgetter.entrySet()) {
+			int tore = map.getValue().size();
+			if (map.getKey().getTeam().equals(homeTeam))
+				homeGoals += tore;
+		}
 		return homeGoals;
-	}
-	
-	public void setHomeGoals(int homeGoals) {
-		this.homeGoals = homeGoals;
 	}
 
 	public int getAwayGoals() {
+		int awayGoals = 0;
+		for (Map.Entry<Player, List<Integer>> map : goalgetter.entrySet()) {
+			int tore = map.getValue().size();
+			if (map.getKey().getTeam().equals(awayTeam))
+				awayGoals += tore;
+		}
 		return awayGoals;
-	}
-
-	public void setAwayGoals(int awayGoals) {
-		this.awayGoals = awayGoals;
 	}
 	
 	public List<Player> getHomeBank() {

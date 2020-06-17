@@ -29,10 +29,10 @@ public class Berechnung {
 		
 		System.out.println("Unentschieden insgesamt: " + getRemis());
 		System.out.println("Spiele insgesamt: " + getGames());
-		System.out.printf("Wahrscheinlichkeit für ein Unentschieden insgesamt: %.2f\n", getProbability(getRemis(), getGames()));
+		System.out.printf("Wahrscheinlichkeit fï¿½r ein Unentschieden insgesamt: %.2f\n", getProbability(getRemis(), getGames()));
 //		System.out.println("Unentschieden der Mannschaft 'FRANCE': " + getRemis("France"));
 //		System.out.println("Anzahl der Spiele der Mannschaft 'FRANCE': " + getGames("France"));
-//		System.out.printf("Wahrscheinlichkeit für ein Unentschieden bei 'FRANCE': %.2f\n", getProbability(getRemis("France"), getGames("France")));
+//		System.out.printf("Wahrscheinlichkeit fï¿½r ein Unentschieden bei 'FRANCE': %.2f\n", getProbability(getRemis("France"), getGames("France")));
 	}
 	
 	public static void readDataFromCSV(File f) {
@@ -59,8 +59,6 @@ public class Berechnung {
 //					System.out.println(team1.getName() + " : " + team2.getName());
 					
 					Match match = new Match(team1, team2, null, null);
-					match.setHomeGoals(tor1);
-					match.setAwayGoals(tor2);
 					matchList.add(match);
 //					System.out.println(matchList.get(i));
 					
@@ -135,8 +133,8 @@ public class Berechnung {
 								System.out.println("Tor in Minute: " + minute);
 							}
 						}
-						matchList.add(match);
 					}
+					matchList.add(match);
 				}
 			}
 			
@@ -150,6 +148,8 @@ public class Berechnung {
 	public static int getRemis() {
 		int i = 0;
 		for(Match m : matchList) {
+			if (m == null) 
+				continue;
 			if(m.getHomeGoals() == m.getAwayGoals()) {
 				i++;
 			}
