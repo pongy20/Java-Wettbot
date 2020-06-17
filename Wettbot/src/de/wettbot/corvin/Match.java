@@ -44,7 +44,7 @@ public class Match {
 
 	public void addGoalgetter(Player player, int minute) {
 		goalMinutes.add(minute);
-		goalgetter.put(player, goalMinutes);	
+		goalgetter.put(player, goalMinutes);
 	}
 	public void addCard(Player player, Card c) {
 		if (playerCards.containsKey(player))
