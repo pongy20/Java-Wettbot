@@ -17,14 +17,14 @@ public class Berechnung {
 	static ArrayList<Match> matchList = new ArrayList<Match>();
 	
 	public static void main(String[] args) throws MalformedURLException {
-//		for(int j = 0; j < 19; j++) {
+		for(int j = 2000; j < 2020; j++) {
 			for(int i = 1; i < 35; i++) {
-				String s = "https://www.fussballdaten.de/bundesliga/2019/";
-				s = s + i + "/";
+				String s = "https://www.fussballdaten.de/bundesliga/";
+				s = s + j + "/" + i + "/";
 				URL url = new URL(s);
 				readDataFromHTML(url);
 			}
-//		}
+		}
 		
 //		File f = new File("src/SoccerDataAllWorldCups.csv");
 		
@@ -130,7 +130,6 @@ public class Berechnung {
 						} else if(teile[i].contains("<div class=\"text-left")) {
 							if(teile[i+1].contains("/person/")) {
 								line = teile[i+1].substring(teile[i+1].indexOf("/person/") + 8, teile[i+1].indexOf("/20"));
-								System.out.println(line);
 								String[] name = line.split("-");
 								if(name.length >= 2) {
 									player = new Player(name[0], name[1], away); 
