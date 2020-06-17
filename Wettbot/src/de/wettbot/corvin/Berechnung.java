@@ -118,15 +118,28 @@ public class Berechnung {
 							if(teile[i+1].contains("/person/")) {
 								line = teile[i+1].substring(teile[i+1].indexOf("/person/") + 8, teile[i+1].indexOf("/20"));
 								String[] name = line.split("-");
-								player = new Player(name[0], name[1], home);
-								System.out.println("Name: " + name[0] + " " + name[1]);
+								if(name.length >= 2) {
+									player = new Player(name[0], name[1], home);
+									System.out.println("Name: " + name[0] + " " + name[1]);
+								} else {
+									player = new Player("", name[0], home);
+									System.out.println("Name: " + name[0]);
+								}
+								
 							}
 						} else if(teile[i].contains("<div class=\"text-left")) {
 							if(teile[i+1].contains("/person/")) {
-								line = teile[i+1].substring(teile[i+1].indexOf("/person/") + 8, teile[i+1].lastIndexOf("/20"));
+								line = teile[i+1].substring(teile[i+1].indexOf("/person/") + 8, teile[i+1].indexOf("/20"));
+								System.out.println(line);
 								String[] name = line.split("-");
-								player = new Player(name[0], name[1], away);
-								System.out.println("Name: " + name[0] + " " + name[1]);
+								if(name.length >= 2) {
+									player = new Player(name[0], name[1], away); 
+									System.out.println("Name: " + name[0] + " " + name[1]);
+								} else {
+									player = new Player("", name[0], away);
+									System.out.println("Name: " + name[0]);
+								}
+								
 							}
 							
 //							Minute des Torerfolgs herausfiltern (innerhalb des Torschuetzenblocks)
