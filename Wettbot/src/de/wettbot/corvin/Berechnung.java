@@ -2,74 +2,104 @@ package de.wettbot.corvin;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Scanner;
 
 public class Berechnung {
-	
-	SimpleDateFormat df = new SimpleDateFormat("YYYY");
-	static File f = new File("src/SoccerDataAllWorldCups.csv");
-	static ArrayList<Team> liste = new ArrayList<Team>();
+
 	static ArrayList<Match> matchList = new ArrayList<Match>();
+	
 	public static void main(String[] args) {
-		readData(f);
-		Team t = liste.get(1);
-		t.getRemisProb();
+		File f = new File("src/SoccerDataAllWorldCups.csv");
+		readDataFromCSV(f);
+		System.out.println("Unentschieden insgesamt: " + getRemis());
+		System.out.println("Spiele insgesamt: " + getGames());
+		System.out.printf("Wahrscheinlichkeit für ein Unentschieden insgesamt: %.2f\n", getProbability(getRemis(), getGames()));
+		System.out.println("Unentschieden der Mannschaft 'FRANCE': " + getRemis("France"));
+		System.out.println("Anzahl der Spiele der Mannschaft 'FRANCE': " + getGames("France"));
+		System.out.printf("Wahrscheinlichkeit für ein Unentschieden bei 'FRANCE': %.2f\n", getProbability(getRemis("France"), getGames("France")));
 	}
 	
-	public static void readData(File f) {
+	public static void readDataFromCSV(File f) {
 		try {
 			Scanner sc = new Scanner(f);
-			sc.nextLine();
-			int i = 0;
+			String line = null;
+			int tor1 = 0;
+			int tor2 = 0;
+//			int i = 0;
 			while(sc.hasNextLine()) {
-				i++;
-				ArrayList<Team> listeT = new ArrayList<Team>();
-				String line = sc.nextLine();
+				line = sc.nextLine();
+//				System.out.println(line);
+				
 				String[] teile = line.split(";");
+//				System.out.println(Arrays.toString(teile));
+				
 				if(teile.length > 7) {
-					Team t = new Team(teile[5]);
-					Team t2 = new Team(teile[6]);
-					Date d = new Date();
-					Calendar c = new GregorianCalendar();
-					c.set(Calendar.YEAR, Integer.parseInt(teile[1]));
-					d = c.getTime();
-					Match m = new Match(t, t2, null, d);
-					m.setHomeGoals(Integer.parseInt(teile[7]));
-					m.setHomeGoals(Integer.parseInt(teile[8]));
-					if(liste.size() == 0) {
-						t.addGame(m); t2.addGame(m);
-						liste.add(t); liste.add(t2);
-					} else {
-						int w = 0;
-						for(Team team : liste) {
-							w++;
-							System.out.println("Teil: " + w);
-							if(t.getName().equals(team.getName())) {
-								t = team; t.addGame(m);
-							} else {
-								listeT.add(t);
-							}
-							if(t2.getName().equals(team.getName())) {
-								t2 = team; t2.addGame(m);
-							} else {
-								listeT.add(t2);
-							}
-						}
-					}
-					System.out.println("Zeile: " + i + line);
-					liste.addAll(listeT);
-					matchList.add(m);
+					tor1 = Integer.parseInt(teile[7]);
+					tor2 = Integer.parseInt(teile[8]);
+//					System.out.println(tor1 + " : " + tor2);
+					
+					Team team1 = new Team(teile[5]);
+					Team team2 = new Team(teile[6]);
+//					System.out.println(team1.getName() + " : " + team2.getName());
+					
+					Match match = new Match(team1, team2, null, null);
+					match.setHomeGoals(tor1);
+					match.setAwayGoals(tor2);
+					matchList.add(match);
+//					System.out.println(matchList.get(i));
+					
+//					i++;
 				}
 				
+				sc.close();
 			}
-			sc.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
+
+	public static int getRemis() {
+		int i = 0;
+		for(Match m : matchList) {
+			if(m.getHomeGoals() == m.getAwayGoals()) {
+				i++;
+			}
+		}
+		return i;
+	}
+	
+	public static int getGames() {
+		return matchList.size();
+	}
+	
+	public static int getRemis(String teamName) {
+		int i = 0;
+		for(Match m : matchList) {
+			if(teamName.equals(m.getHomeTeam().getName()) || teamName.equals(m.getAwayTeam().getName())) {
+				if(m.getHomeGoals() == m.getAwayGoals()) {
+					i++;
+				}
+			}
+		}
+		return i;
+	}
+	
+	public static int getGames(String teamName) {
+		int i = 0;
+		for(Match m : matchList) {
+			if(teamName.equals(m.getHomeTeam().getName()) || teamName.equals(m.getAwayTeam().getName())) {
+				i++;
+			}
+		}
+		return i;
+	}
+	
+	public static double getProbability(int n, int N) {
+		double kleinN = n;
+		double grossN = N;
+		return (kleinN / grossN) * 100;
+	}
+	
+	
 }

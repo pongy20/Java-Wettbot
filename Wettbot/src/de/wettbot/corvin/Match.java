@@ -39,6 +39,7 @@ public class Match {
 		this.date = date;
 		goalgetter = new TreeMap<Player, List<Integer>>();
 		playerCards = new TreeMap<Player, Card>();
+		this.homeGoals = 0; this.awayGoals = 0;
 	}
 
 	public void addGoalgetter(Player player, int minute) {
