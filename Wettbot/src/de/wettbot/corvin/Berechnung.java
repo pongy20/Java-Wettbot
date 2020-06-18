@@ -39,6 +39,14 @@ public class Berechnung {
 		System.out.println("Unentschieden insgesamt: " + getRemis());
 		System.out.println("Spiele insgesamt: " + getGames());
 		System.out.printf("Wahrscheinlichkeit für ein Unentschieden insgesamt: %.2f\n", getProbability(getRemis(), getGames()));
+		System.out.println();
+		System.out.println("Wahrschienlichkeit für ein Unentschieden zwischen den Mannschaften:");
+		String teamHomeName = matchList.get(0).getHomeTeam().getName();
+		String teamAwayName = matchList.get(0).getAwayTeam().getName();
+		System.out.println(teamHomeName + " und " + teamAwayName);
+		System.out.printf("%.2f%%", getRemisQuoteInPercent(teamHomeName, teamAwayName));
+		System.out.println();
+		System.out.printf("Die Quote für diese Wahrscheinlichkeit beträgt: %.2f", getRemisQuote(teamHomeName, teamAwayName));
 //		System.out.println("Unentschieden der Mannschaft 'FRANCE': " + getRemis("France"));
 //		System.out.println("Anzahl der Spiele der Mannschaft 'FRANCE': " + getGames("France"));
 //		System.out.printf("Wahrscheinlichkeit fï¿½r ein Unentschieden bei 'FRANCE': %.2f\n", getProbability(getRemis("France"), getGames("France")));
@@ -251,12 +259,29 @@ public class Berechnung {
 		}
 		return i;
 	}
+
 	
 	public static double getProbability(int n, int N) {
 		double kleinN = n;
 		double grossN = N;
-		return (kleinN / grossN) * 100;
+		return (kleinN / grossN);
 	}
 	
+	public static double getRemisQuoteInPercent(String teamHomeName, String teamAwayName) {
+		double homeProb = getProbability(getRemis(teamHomeName), getGames(teamHomeName));
+		double awayProb = getProbability(getRemis(teamAwayName), getGames(teamAwayName));
+		double quote = (homeProb + awayProb) / 2;
+		return quote * 100;
+	}
+	
+	public static double getRemisQuote(String teamHomeName, String teamAwayName) {
+		double probGesamt = getProbability(getRemis(), getGames());
+		double probMatch = getRemisQuoteInPercent(teamHomeName, teamAwayName) / 100;
+		if(probGesamt > probMatch) {
+			return ((probGesamt - probMatch) + 0.025) * 100;
+		} else {
+			return ((probMatch - probGesamt) + 0.025) * 100;
+		}
+	}
 	
 }
