@@ -34,7 +34,6 @@ public class Berechnung {
 //				readDataFromHTML(url);
 //			}
 //		}
-		
 		readDataFromCSV(f);
 		
 		System.out.println("Unentschieden insgesamt: " + getRemis());
@@ -93,20 +92,19 @@ public class Berechnung {
 	public static void printDataInCSV(Match match) {
 		try {
 			FileWriter fw = new FileWriter(f, true);
-			SimpleDateFormat df = new SimpleDateFormat("dd.MM.YYYY");
-			if(!exit) {
-				fw.write(df.format(match.getDate()).replace(";", ",") + ";");
-				fw.write(match.getHomeTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";");
-				fw.write(match.getAwayTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";");
-				for(Map.Entry<Player, List<Integer>> map : match.getGoalgetter().entrySet()) {
-					fw.write(map.getValue().get(0) + ";" + map.getKey().getTeam().getName().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getSurname().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getLastname().replace("&#039;", "önchen").replace(";", ",")  + ";");
-					for(int i = 1; i < map.getValue().size(); i++) {
-						fw.write(map.getValue().get(i) + ";" + map.getKey().getTeam().getName().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getSurname().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getLastname().replace("&#039;", "önchen").replace(";", ",")  + ";");
-					}
+			SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+			fw.append(df.format(match.getDate()).replace(";", ",") + ";");
+			fw.append(match.getHomeTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";");
+			fw.append(match.getAwayTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";");
+			for(Map.Entry<Player, List<Integer>> map : match.getGoalgetter().entrySet()) {
+				fw.append(map.getValue().get(0) + ";" + map.getKey().getTeam().getName().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getSurname().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getLastname().replace("&#039;", "önchen").replace(";", ",")  + ";");
+				for(int i = 1; i < map.getValue().size(); i++) {
+					fw.append(map.getValue().get(i) + ";" + map.getKey().getTeam().getName().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getSurname().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getLastname().replace("&#039;", "önchen").replace(";", ",")  + ";");
 				}
-				fw.write("\n");
-				fw.flush();
-			} else {
+			}
+			fw.append("\n");
+			fw.flush();
+			if(exit) {
 				fw.close();
 			}
 		} catch (IOException e) {
@@ -119,7 +117,7 @@ public class Berechnung {
 		
 		try {
 			BufferedInputStream bis = new BufferedInputStream(url.openStream());
-			SimpleDateFormat df = new SimpleDateFormat("dd.MM.YYYY");
+			SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
 			Scanner sc = new Scanner(bis, "UTF-8");
 			String line = null;
 			Team home = null;
@@ -159,7 +157,9 @@ public class Berechnung {
 //						Datum des Spieltages herausfiltern
 						if(teile[i].contains("datum-row")) {
 							line = teile[i+1].substring(teile[i+1].indexOf(", ") + 2, teile[i+1].indexOf("<"));
+							System.out.println(line);
 							date = df.parse(line);
+//							System.out.println("Date: " + date);
 						}
 						
 						
