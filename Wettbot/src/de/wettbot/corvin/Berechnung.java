@@ -1,34 +1,41 @@
 package de.wettbot.corvin;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Berechnung {
 
 	static ArrayList<Match> matchList = new ArrayList<Match>();
+	static File f = new File("src/SoccerDataBundesliga.csv");
+	static boolean exit = false;
 	
-	public static void main(String[] args) throws MalformedURLException {
-		for(int j = 2000; j < 2020; j++) {
-			for(int i = 1; i < 35; i++) {
-				String s = "https://www.fussballdaten.de/bundesliga/";
-				s = s + j + "/" + i + "/";
-				URL url = new URL(s);
-				readDataFromHTML(url);
-			}
-		}
+	public static void main(String[] args) throws MalformedURLException, FileNotFoundException {
+//		PrintWriter pw = new PrintWriter(f);
+//		pw.print("");
+//		for(int j = 2000; j < 2020; j++) {
+//			for(int i = 1; i < 35; i++) {
+//				String s = "https://www.fussballdaten.de/bundesliga/";
+//				s = s + j + "/" + i + "/";
+//				URL url = new URL(s);
+//				readDataFromHTML(url);
+//			}
+//		}
 		
-//		File f = new File("src/SoccerDataAllWorldCups.csv");
-		
-//		readDataFromCSV(f);
+		readDataFromCSV(f);
 		
 		System.out.println("Unentschieden insgesamt: " + getRemis());
 		System.out.println("Spiele insgesamt: " + getGames());
@@ -42,41 +49,72 @@ public class Berechnung {
 		try {
 			Scanner sc = new Scanner(f);
 			String line = null;
-			int tor1 = 0;
-			int tor2 = 0;
-//			int i = 0;
 			while(sc.hasNextLine()) {
-				line = sc.nextLine();
-//				System.out.println(line);
-				
+				line = sc.nextLine();				
 				String[] teile = line.split(";");
-//				System.out.println(Arrays.toString(teile));
 				
-				if(teile.length > 7) {
-					tor1 = Integer.parseInt(teile[7]);
-					tor2 = Integer.parseInt(teile[8]);
-//					System.out.println(tor1 + " : " + tor2);
-					
-					Team team1 = new Team(teile[5]);
-					Team team2 = new Team(teile[6]);
-//					System.out.println(team1.getName() + " : " + team2.getName());
-					
-					Match match = new Match(team1, team2, null, null);
-					matchList.add(match);
-//					System.out.println(matchList.get(i));
-					
-//					i++;
+				Date date = new Date();
+				SimpleDateFormat df = new SimpleDateFormat("dd.MM.YYYY");
+				date = df.parse(teile[0]);
+				Team homeTeam = new Team(teile[1]);
+				Team awayTeam = new Team(teile[2]);
+				Match match = new Match(homeTeam, awayTeam, null, date);
+				
+				if(teile.length > 6) {
+					for(int i = 3; i < teile.length - 3; i++) {
+						int minute = Integer.parseInt(teile[i]);
+						i++;
+						if(homeTeam.getName().equals(teile[i])) {
+							i++;
+							Player player = new Player(teile[i], teile[i+1], homeTeam);
+							match.addGoalgetter(player, minute);
+						} else if(awayTeam.getName().equals(teile[i])) {
+							i++;
+							Player player = new Player(teile[i], teile[i+1], awayTeam);
+							match.addGoalgetter(player, minute);
+						}
+						i++;
+						
+						
+					}
 				}
-				
+				matchList.add(match);
 			}
 			
 			sc.close();
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
 		}
 	}
 
+	public static void printDataInCSV(Match match) {
+		try {
+			FileWriter fw = new FileWriter(f, true);
+			SimpleDateFormat df = new SimpleDateFormat("dd.MM.YYYY");
+			if(!exit) {
+				fw.write(df.format(match.getDate()).replace(";", ",") + ";");
+				fw.write(match.getHomeTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";");
+				fw.write(match.getAwayTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";");
+				for(Map.Entry<Player, List<Integer>> map : match.getGoalgetter().entrySet()) {
+					fw.write(map.getValue().get(0) + ";" + map.getKey().getTeam().getName().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getSurname().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getLastname().replace("&#039;", "önchen").replace(";", ",")  + ";");
+					for(int i = 1; i < map.getValue().size(); i++) {
+						fw.write(map.getValue().get(i) + ";" + map.getKey().getTeam().getName().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getSurname().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getLastname().replace("&#039;", "önchen").replace(";", ",")  + ";");
+					}
+				}
+				fw.write("\n");
+				fw.flush();
+			} else {
+				fw.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("FLUSH");
+	}
+	
 	public static void readDataFromHTML(URL url) {
 		
 		try {
@@ -86,7 +124,7 @@ public class Berechnung {
 			String line = null;
 			Team home = null;
 			Team away = null;
-			Match match = null;
+			Match match = null, matchAlt = null;
 			Player player = null;
 			Date date = null;
 			int minute = 0;
@@ -106,6 +144,18 @@ public class Berechnung {
 							matchList.add(match);
 						}
 						
+						
+						if(match != null) {
+							if(matchAlt != match) {
+								if(matchAlt != null) {
+									printDataInCSV(matchAlt);
+								}
+								matchAlt = match;
+							} 
+								
+						}
+						
+						
 //						Datum des Spieltages herausfiltern
 						if(teile[i].contains("datum-row")) {
 							line = teile[i+1].substring(teile[i+1].indexOf(", ") + 2, teile[i+1].indexOf("<"));
@@ -124,6 +174,7 @@ public class Berechnung {
 								} else {
 									player = new Player("", name[0], home);
 									System.out.println("Name: " + name[0]);
+									
 								}
 								
 							}
@@ -137,6 +188,7 @@ public class Berechnung {
 								} else {
 									player = new Player("", name[0], away);
 									System.out.println("Name: " + name[0]);
+									
 								}
 								
 							}
@@ -148,12 +200,14 @@ public class Berechnung {
 								match.addGoalgetter(player, minute);
 								System.out.println("Tor in Minute: " + minute);
 							}
-						}
+						}						
 					}
 				}
 			}
 			
 			sc.close();
+			exit = true;
+			printDataInCSV(matchAlt);
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
