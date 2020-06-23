@@ -19,7 +19,7 @@ import java.util.Scanner;
 
 public class Berechnung {
 
-	static ArrayList<Match> matchList = new ArrayList<Match>();
+	static ArrayList<Match> matchList = new ArrayList<Match>(), spieltag = new ArrayList<Match>();
 	static File f = new File("src/SoccerDataBundesliga.csv");
 	static boolean exit = false;
 	
@@ -31,28 +31,31 @@ public class Berechnung {
 //				String s = "https://www.fussballdaten.de/bundesliga/";
 //				s = s + j + "/" + i + "/";
 //				URL url = new URL(s);
-//				readDataFromHTML(url);
+//				flushDataFromHTMLtoCSV(url, f);
 //			}
 //		}
-		readDataFromCSV(f);
+//		flushMatchDay();
+//		readDataFromCSV(f, false);
+//		System.out.println("Unentschieden insgesamt: " + getRemis());
+//		System.out.println("Spiele insgesamt: " + getGames());
+//		System.out.printf("Wahrscheinlichkeit für ein Unentschieden insgesamt: %.2f\n", getProbability(getRemis(), getGames()));
+//		System.out.println();
+//		System.out.println("Wahrschienlichkeit für ein Unentschieden zwischen den Mannschaften:");
+//		String teamHomeName = "RB Leipzig";
+//		String teamAwayName = "Dortmund";
+//		System.out.println(teamHomeName + " und " + teamAwayName);
+//		System.out.printf("%.2f%%", getRemisQuoteInPercent(teamHomeName, teamAwayName));
+//		System.out.println();
+//		System.out.printf("Die Quote für diese Wahrscheinlichkeit beträgt: %.2f", getRemisQuote(teamHomeName, teamAwayName));
 		
-		System.out.println("Unentschieden insgesamt: " + getRemis());
-		System.out.println("Spiele insgesamt: " + getGames());
-		System.out.printf("Wahrscheinlichkeit für ein Unentschieden insgesamt: %.2f\n", getProbability(getRemis(), getGames()));
-		System.out.println();
-		System.out.println("Wahrschienlichkeit für ein Unentschieden zwischen den Mannschaften:");
-		String teamHomeName = matchList.get(0).getHomeTeam().getName();
-		String teamAwayName = matchList.get(0).getAwayTeam().getName();
-		System.out.println(teamHomeName + " und " + teamAwayName);
-		System.out.printf("%.2f%%", getRemisQuoteInPercent(teamHomeName, teamAwayName));
-		System.out.println();
-		System.out.printf("Die Quote für diese Wahrscheinlichkeit beträgt: %.2f", getRemisQuote(teamHomeName, teamAwayName));
-//		System.out.println("Unentschieden der Mannschaft 'FRANCE': " + getRemis("France"));
-//		System.out.println("Anzahl der Spiele der Mannschaft 'FRANCE': " + getGames("France"));
-//		System.out.printf("Wahrscheinlichkeit fï¿½r ein Unentschieden bei 'FRANCE': %.2f\n", getProbability(getRemis("France"), getGames("France")));
+		
+		for(Match m : spieltag) {
+			System.out.println(m.getHomeTeam().getName());
+		}
+		calculateMatchDay();
 	}
 	
-	public static void readDataFromCSV(File f) {
+	public static void readDataFromCSV(File f, boolean predictionData) {
 		try {
 			Scanner sc = new Scanner(f);
 			String line = null;
@@ -81,11 +84,13 @@ public class Berechnung {
 							match.addGoalgetter(player, minute);
 						}
 						i++;
-						
-						
 					}
 				}
-				matchList.add(match);
+				if(predictionData) {
+					spieltag.add(match);
+				} else {
+					matchList.add(match);
+				}
 			}
 			
 			sc.close();
@@ -97,23 +102,25 @@ public class Berechnung {
 		}
 	}
 
-	public static void printDataInCSV(Match match) {
+	public static void printDataInCSV(File f, Match match) {
 		try {
 			FileWriter fw = new FileWriter(f, true);
+			BufferedWriter bw = new BufferedWriter(fw);
 			SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-			fw.append(df.format(match.getDate()).replace(";", ",") + ";");
-			fw.append(match.getHomeTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";");
-			fw.append(match.getAwayTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";");
+			bw.append(df.format(match.getDate()).replace(";", ",") + ";");
+			bw.append(match.getHomeTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";");
+			bw.append(match.getAwayTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";");
 			for(Map.Entry<Player, List<Integer>> map : match.getGoalgetter().entrySet()) {
-				fw.append(map.getValue().get(0) + ";" + map.getKey().getTeam().getName().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getSurname().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getLastname().replace("&#039;", "önchen").replace(";", ",")  + ";");
+				bw.append(map.getValue().get(0) + ";" + map.getKey().getTeam().getName().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getSurname().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getLastname().replace("&#039;", "önchen").replace(";", ",")  + ";");
 				for(int i = 1; i < map.getValue().size(); i++) {
-					fw.append(map.getValue().get(i) + ";" + map.getKey().getTeam().getName().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getSurname().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getLastname().replace("&#039;", "önchen").replace(";", ",")  + ";");
+					bw.append(map.getValue().get(i) + ";" + map.getKey().getTeam().getName().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getSurname().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getLastname().replace("&#039;", "önchen").replace(";", ",")  + ";");
 				}
 			}
-			fw.append("\n");
-			fw.flush();
+			bw.append("\n");
+			bw.flush();
 			if(exit) {
 				fw.close();
+				bw.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -121,7 +128,7 @@ public class Berechnung {
 		System.out.println("FLUSH");
 	}
 	
-	public static void readDataFromHTML(URL url) {
+	public static void flushDataFromHTMLtoCSV(URL url, File f) {
 		
 		try {
 			BufferedInputStream bis = new BufferedInputStream(url.openStream());
@@ -147,14 +154,13 @@ public class Berechnung {
 							home = new Team(s[0]);
 							away = new Team(s[1]);
 							match = new Match(home, away, null, date);
-							matchList.add(match);
 						}
 						
 						
 						if(match != null) {
 							if(matchAlt != match) {
 								if(matchAlt != null) {
-									printDataInCSV(matchAlt);
+									printDataInCSV(f, matchAlt);
 								}
 								matchAlt = match;
 							} 
@@ -215,7 +221,7 @@ public class Berechnung {
 			
 			sc.close();
 			exit = true;
-			printDataInCSV(matchAlt);
+			printDataInCSV(f, matchAlt);
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
@@ -260,6 +266,49 @@ public class Berechnung {
 		return i;
 	}
 
+	public static void flushMatchDay() {
+		File f = new File("src/BundesligaSpieltag.csv");
+		try {
+			PrintWriter pw = new PrintWriter(f);
+			if(f.exists()) {
+				readDataFromCSV(f, false);
+				for(Match m : matchList) {
+					System.out.println(m.getHomeTeam().getName());
+					printDataInCSV(Berechnung.f, m);
+				}
+				
+			}
+			pw.print("");
+			pw.close();
+			for(int i = 1; i < 33; i++) {
+				String s = "https://www.fussballdaten.de/bundesliga/2020/" + i + "/";
+				flushDataFromHTMLtoCSV(new URL(s), f);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void calculateMatchDay() {
+		readDataFromCSV(f, false);
+		File f = new File("src/BundesligaSpieltag.csv");
+		readDataFromCSV(f, true);
+		int i = 1;
+		for(Match m : spieltag) {
+			System.out.println("Wahrscheinlichkeit für ein Unentschieden zwischen den Mannschaften:");
+			String teamHomeName = m.getHomeTeam().getName();
+			String teamAwayName = m.getAwayTeam().getName();
+			System.out.println(teamHomeName + " und " + teamAwayName);
+			System.out.printf("%.2f%%", getRemisQuoteInPercent(teamHomeName, teamAwayName));
+			System.out.println();
+			System.out.printf("Die Quote für diese Wahrscheinlichkeit beträgt: %.2f\n\n", getRemisQuote(teamHomeName, teamAwayName));
+			i++;
+		}
+		System.out.println();
+		System.out.println("Berechnet aus: " + i +" Daten");
+	}
 	
 	public static double getProbability(int n, int N) {
 		double kleinN = n;
@@ -275,13 +324,11 @@ public class Berechnung {
 	}
 	
 	public static double getRemisQuote(String teamHomeName, String teamAwayName) {
-		double probGesamt = getProbability(getRemis(), getGames());
 		double probMatch = getRemisQuoteInPercent(teamHomeName, teamAwayName) / 100;
-		if(probGesamt > probMatch) {
-			return ((probGesamt - probMatch) + 0.025) * 100;
-		} else {
-			return ((probMatch - probGesamt) + 0.025) * 100;
-		}
+		return 1 / probMatch;
 	}
 	
+	public static void getQuoteInPercent(String teamHomeName, String teamAwayName) {
+		
+	}
 }
