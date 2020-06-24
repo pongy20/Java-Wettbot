@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class OutputNeuron extends Neuron{
 
 	private List<Connection> connections = new ArrayList<>();
-	private ActivationFunction activationFunktion = ActivationFunction.identity;
+	private ActivationFunction activationFunktion = ActivationFunction.bool;
 	
 	@Override
 	public float getValue() {
