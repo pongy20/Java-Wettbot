@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class OutputNeuron extends Neuron{
 
 	private List<Connection> connections = new ArrayList<>();
-	private ActivationFunction activationFunktion = ActivationFunction.hyperbol;
+	private ActivationFunction activationFunktion = ActivationFunction.identity;
 	
 	@Override
 	public float getValue() {
@@ -22,5 +22,11 @@ public class OutputNeuron extends Neuron{
 	public void addConnection(Connection c) {
 		connections.add(c);
 	}
-	
+
+	public void deltaLearning(float epsilon, float smallDelta) {
+		for(int i = 0; i < connections.size(); i++) {
+			float bigDelta = epsilon * smallDelta * connections.get(i).getValue();
+			connections.get(i).addWeight(bigDelta);
+		}
+	}
 }

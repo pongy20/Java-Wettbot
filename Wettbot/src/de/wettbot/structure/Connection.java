@@ -14,4 +14,8 @@ public class Connection {
 		return this.weight;
 	}
 
+	public void addWeight(float weightDelta) {
+		weight += weightDelta;
+	}
+
 }
