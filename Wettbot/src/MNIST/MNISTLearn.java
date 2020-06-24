@@ -34,7 +34,7 @@ public class MNISTLearn {
 		Random rand = new Random();
 		float[] weights = new float[28 * 28 * 10];
 		for(int i = 0; i < weights.length; i++) {
-			weights[i] = rand.nextFloat();
+			weights[i] = rand.nextFloat(); 
 		}
 	}
 }
