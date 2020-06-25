@@ -21,7 +21,7 @@ public class NeuralNetwork {
 		return on;
 	}
 	
-	public void createFullMash() {
+	public void createFullMesh() {
 		if(hiddenNeurons.size() == 0) {
 			for(OutputNeuron on : outputNeurons) {
 				for(InputNeuron in : inputNeurons) {
@@ -40,7 +40,7 @@ public class NeuralNetwork {
 		}
 	}
 
-	public void createFullMash(float... weights) {
+	public void createFullMesh(float... weights) {
 		if(hiddenNeurons.size() == 0) {
 			if(weights.length != inputNeurons.size() * outputNeurons.size()) {
 				throw new RuntimeException();

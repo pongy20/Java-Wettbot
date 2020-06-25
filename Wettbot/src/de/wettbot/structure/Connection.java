@@ -15,7 +15,10 @@ public class Connection {
 	}
 
 	public void addWeight(float weightDelta) {
-		weight += weightDelta;
+		this.weight += weightDelta;
 	}
 
+	public Neuron getNeuron() {
+		return this.neuron;
+	}
 }
