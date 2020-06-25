@@ -42,9 +42,9 @@ public class MNISTLearn {
 		
 		
 		float epsilon = 0.01f;
-		
-		while(true) {
-			test();
+		float percentage = 0f;
+		while(percentage < 0.8f) {
+			percentage = test();
 			for(int i = 0; i < digits.size(); i++) {
 				for(int x = 0; x < 28; x++) {
 					for(int y = 0; y < 28; y++) {
@@ -59,7 +59,7 @@ public class MNISTLearn {
 		}
 	}
 	
-	public static void test() {
+	public static float test() {
 		int correct = 0;
 		int incorrect = 0;
 		
@@ -92,6 +92,7 @@ public class MNISTLearn {
 		
 		float percentage = (float) correct / (float) (correct + incorrect);
 		System.out.println(percentage);
+		return percentage;
 	}
 	
 	public static class ProbabilityDigit implements Comparable<ProbabilityDigit>{
