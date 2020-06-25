@@ -73,15 +73,11 @@ public class MNISTLearn {
 			ProbabilityDigit[] probs = new ProbabilityDigit[10];
 			for(int k = 0; k < probs.length; k++) {
 				probs[k] = new ProbabilityDigit(k, outputs[k].getValue());
-				System.out.println(outputs[k].getValue());
 			}
-			System.out.println();
-			System.out.println("-------------------");
-			System.out.println();
 			
 			Arrays.sort(probs, Collections.reverseOrder());
 			boolean wasCorrect = false;
-			for(int k = 0; k < 9; k++) {
+			for(int k = 0; k < 1; k++) {
 				if(digitsTest.get(i).label == probs[k].DIGIT) {
 					wasCorrect = true;
 				}
