@@ -7,4 +7,10 @@ public class Sigmoid implements ActivationFunction{
 		return (float) (1f / (1f + Math.pow(Math.E, -input)));
 	}
 
+	@Override
+	public float derivative(float input) {
+		float sig = activation(input);
+		return sig * (1 - sig);
+	}
+
 }

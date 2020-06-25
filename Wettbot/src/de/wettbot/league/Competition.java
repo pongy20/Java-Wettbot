@@ -1,6 +1,7 @@
 package de.wettbot.league;
 
-import java.util.List;
+
+import java.util.Map;
 
 import de.wettbot.team.Team;
 
@@ -8,9 +9,6 @@ public class Competition {
 
 	private String name;
 	private Country country;
-	private List<Team> teams;
-	
-	public Competition() {
-		
-	}
+	private Map<Team, Integer> tabelle;
+
 }

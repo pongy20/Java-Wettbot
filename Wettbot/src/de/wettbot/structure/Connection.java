@@ -21,4 +21,9 @@ public class Connection {
 	public Neuron getNeuron() {
 		return this.neuron;
 	}
+
+	public float getWeight() {
+		return weight;
+	}
+	
 }

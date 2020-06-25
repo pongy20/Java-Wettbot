@@ -7,4 +7,9 @@ public class Identity implements ActivationFunction {
 		return input;
 	}
 
+	@Override
+	public float derivative(float input) {
+		return 1;
+	}
+
 }

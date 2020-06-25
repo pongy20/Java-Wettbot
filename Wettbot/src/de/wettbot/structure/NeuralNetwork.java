@@ -80,18 +80,36 @@ public class NeuralNetwork {
 		}
 	}
 	
-	public void deltaLearning(float[] shoulds, float epsilon) {
+	public void backpropagation(float[] shoulds, float epsilon) {
 		if(shoulds.length != outputNeurons.size()) {
 			throw new IllegalArgumentException();
 		}
 		
-		if(hiddenNeurons.size() != 0) {
-			throw new IllegalStateException();
+		reset();
+		for(int i = 0; i < shoulds.length; i++) {
+			outputNeurons.get(i).calculateOutputDelta(shoulds[i]);
 		}
 		
-		for (int i = 0; i < shoulds.length; i++) {
-			float smallDelta = shoulds[i] - outputNeurons.get(i).getValue();
-			outputNeurons.get(i).deltaLearning(epsilon, smallDelta);
+		if(hiddenNeurons.size() > 0) {
+			for(int i = 0; i < shoulds.length; i++) {
+				outputNeurons.get(i).backPropagate();
+			}
+		}
+		
+		for(OutputNeuron n : outputNeurons) {
+			n.deltaLearning(epsilon);
+		}
+		for(OutputNeuron n : hiddenNeurons) {
+			n.deltaLearning(epsilon);
+		}
+	}
+	
+	public void reset() {
+		for(OutputNeuron on : outputNeurons) {
+			on.reset();
+		}
+		for(OutputNeuron on : hiddenNeurons) {
+			on.reset();
 		}
 	}
 }

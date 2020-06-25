@@ -7,5 +7,6 @@ public interface ActivationFunction {
 	public static HyperbolicTang hyperbol = new HyperbolicTang();
 	
 	public float activation(float input);
+	public float derivative(float input);
 	
 }

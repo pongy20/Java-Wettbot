@@ -4,10 +4,16 @@ public class HyperbolicTang implements ActivationFunction {
 
 	@Override
 	public float activation(float input) {
-		float epx = (float)Math.pow(Math.E, input);
-		float enx = (float)Math.pow(Math.E, -input);
+		double epx = Math.pow(Math.E, input);
+		double enx = Math.pow(Math.E, -input);
 		
-		return (epx - enx) / (epx + enx);
+		return (float) ((epx - enx) / (epx + enx));
+	}
+
+	@Override
+	public float derivative(float input) {
+		float tanh = activation(input);
+		return 1 - tanh * tanh;
 	}
 
 }

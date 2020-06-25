@@ -8,4 +8,9 @@ public class FunctionBoolean implements ActivationFunction {
 		else return 1;
 	}
 
+	@Override
+	public float derivative(float input) {
+		return 1;
+	}
+
 }

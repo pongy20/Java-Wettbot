@@ -33,15 +33,18 @@ public class MNISTLearn {
 			outputs[i] = nn.createNewOutput();
 		}
 		
+		int numHiddenNeurons = 50;
+		nn.createHiddenNeurons(numHiddenNeurons);
+		
 		Random rand = new Random();
-		float[] weights = new float[28 * 28 * 10];
+		float[] weights = new float[28 * 28 * numHiddenNeurons + numHiddenNeurons * 10];
 		for(int i = 0; i < weights.length; i++) {
 			weights[i] = rand.nextFloat(); 
 		}
 		nn.createFullMesh(weights);
 		
 		
-		float epsilon = 0.01f;
+		float epsilon = 0.0005f;
 		float percentage = 0f;
 		while(percentage < 0.8f) {
 			percentage = test();
@@ -53,7 +56,7 @@ public class MNISTLearn {
 				}
 				float[] shoulds = new float[10];
 				shoulds[digits.get(i).label] = 1;
-				nn.deltaLearning(shoulds, epsilon);
+				nn.backpropagation(shoulds, epsilon);
 			}
 			epsilon *= 0.9f;
 		}
@@ -64,6 +67,7 @@ public class MNISTLearn {
 		int incorrect = 0;
 		
 		for(int i = 0; i < digitsTest.size(); i++) {
+			nn.reset();
 			for(int x = 0; x < 28; x++) {
 				for(int y = 0; y < 28; y++) {
 					inputs[x][y].setValue(Decoder.toUnsignedByte(digitsTest.get(i).data[x][y]) / 255f);
