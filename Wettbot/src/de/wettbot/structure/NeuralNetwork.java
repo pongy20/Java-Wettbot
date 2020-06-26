@@ -3,6 +3,8 @@ package de.wettbot.structure;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.wettbot.functions.ActivationFunction;
+
 public class NeuralNetwork {
 
 	private List<InputNeuron> inputNeurons = new ArrayList<>();
@@ -76,7 +78,9 @@ public class NeuralNetwork {
 
 	public void createHiddenNeurons(int amount) {
 		for(int i = 0; i < amount; i++) {
-			hiddenNeurons.add(new OutputNeuron());
+			OutputNeuron on = new OutputNeuron();
+			on.setFunction(ActivationFunction.relu);
+			hiddenNeurons.add(on);
 		}
 	}
 	

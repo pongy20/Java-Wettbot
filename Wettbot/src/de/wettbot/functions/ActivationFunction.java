@@ -5,6 +5,7 @@ public interface ActivationFunction {
 	public static FunctionBoolean bool = new FunctionBoolean();
 	public static Sigmoid sigmoid = new Sigmoid();
 	public static HyperbolicTang hyperbol = new HyperbolicTang();
+	public static ReLU relu = new ReLU();
 	
 	public float activation(float input);
 	public float derivative(float input);

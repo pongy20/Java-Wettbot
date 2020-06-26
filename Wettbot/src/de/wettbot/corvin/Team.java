@@ -1,6 +1,6 @@
 package de.wettbot.corvin;
 
-public class Team {
+public class Team implements Comparable<Team>{
 
 	private String name;
 	private int aktPunkte;
@@ -23,6 +23,15 @@ public class Team {
 
 	public int getPoints() {
 		return this.aktPunkte;
+	}
+
+	@Override
+	public int compareTo(Team o) {
+		if(this.getPoints() >= o.getPoints()) {
+			return 1;
+		} else {
+			return -1;
+		}
 	}
 
 }

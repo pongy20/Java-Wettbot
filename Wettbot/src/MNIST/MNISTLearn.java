@@ -46,8 +46,11 @@ public class MNISTLearn {
 		
 		float epsilon = 0.0005f;
 		float percentage = 0f;
-		while(percentage < 0.8f) {
+		while(true) {
 			percentage = test();
+			if(percentage >= 0.9f) {
+				break;
+			}
 			for(int i = 0; i < digits.size(); i++) {
 				for(int x = 0; x < 28; x++) {
 					for(int y = 0; y < 28; y++) {

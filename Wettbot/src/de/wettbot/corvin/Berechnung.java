@@ -55,6 +55,10 @@ public class Berechnung {
 		calculateMatchDay();
 	}
 	
+	public static ArrayList<Match> getMatchList(){
+		return matchList;
+	}
+	
 	public static void readDataFromCSV(File f, boolean predictionData) {
 		try {
 			Scanner sc = new Scanner(f);

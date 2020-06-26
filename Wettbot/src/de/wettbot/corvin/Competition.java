@@ -1,6 +1,7 @@
 package de.wettbot.corvin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -25,26 +26,53 @@ public class Competition {
 		return country;
 	}
 	public void addTeam(Team team) {
-		this.teams.add(team);
+		boolean bool = false;
+		for(Team t : teams) {
+			if(t.getName().equals(team.getName())) {
+				bool = true;
+			}
+		}
+		if(!bool) {
+			this.teams.add(team);
+		}
+		
 	}
 	public int[] getPoints() {
-		int[] i = new int[18];
-		for(int n = 0; n < teams.size(); n++) {
+		int[] i = new int[tabelle.size()];
+		for(int n = 0; n < i.length; n++) {
 			i[n] = teams.get(n).getPoints();
 		}
 		return i;
 	}
 	
+	public void fillTabelle() {
+		for(int i = 0; i < 9; i++) {
+			resetTabell();
+			Team t1 = Berechnung.getMatchList().get(i).getHomeTeam();
+			Team t2 = Berechnung.getMatchList().get(i).getAwayTeam();
+			addTeam(t1);
+			addTeam(t2);
+			tabelle.add(t1);
+			tabelle.add(t2);
+		}
+	}
+	
+	private void resetTabell() {
+		this.tabelle.removeAll(tabelle);
+	}
+
 	public void sortTabelle() {
-		int z = 0;
 		for(int i = 0; i < tabelle.size(); i++) {
+			int z = 0;
 			int x = 0;
-			for(int k = 0; k < tabelle.size(); k++) {
+			int k = i;
+			while(k < tabelle.size()) {
 				int y = tabelle.get(k).getPoints();
 				if(x < y) {
 					z = k;
 					x = tabelle.get(k).getPoints();
 				}
+				k++;
 			}
 			tabelle.add(i, tabelle.get(z));
 		}

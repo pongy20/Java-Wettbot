@@ -43,6 +43,10 @@ public class OutputNeuron extends Neuron{
 		}
 	}
 	
+	public void setFunction(ActivationFunction af) {
+		this.activationFunktion = af;
+	}
+	
 	public void calculateOutputDelta(float should) {
 		smallDelta = should - getValue();
 	}
