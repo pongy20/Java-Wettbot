@@ -50,10 +50,16 @@ public class Competition {
 		return i;
 	}
 	
+	public int getPunkte(Team t) {
+		int punkte = 0;
+		
+		return punkte;
+	}
+	
 	public void fillTabelle() {
 		resetTabelle();
 		setSeason(getSeason() + 1);
-		for(int i = 0; i < 9; i++) {
+		for(int i = 0; i < 9 * 34; i++) {
 			Team t1 = Berechnung.getMatchList().get(i).getHomeTeam();
 			Team t2 = Berechnung.getMatchList().get(i).getAwayTeam();
 			addTeam(t1);
@@ -95,20 +101,7 @@ public class Competition {
 	public void startMatchday(int matchDayNumber) {
 		ArrayList<Match> matches = new ArrayList<Match>();
 		for(int k = 0; k < 9 * matchDayNumber; k++) {
-			matches.add(Berechnung.getMatchList().get(k));
-		}
-		for(Match m : matches) {
-			m.distributePoints();
-			Team t1 = m.getHomeTeam();
-			Team t2 = m.getAwayTeam();
-			for(Team t : teams) {
-				if(t.getName().equals(t1.getName())) {
-					t.setPoints(t.getPoints() + t1.getPoints());
-					break;
-				} else if(t.getName().equals(t2.getName())) {
-					t.setPoints(t.getPoints() + t2.getPoints());
-				}
-			}
+			System.out.println(Berechnung.getMatchList().get(k).getHomeTeam().getName());
 		}
 	}
 	

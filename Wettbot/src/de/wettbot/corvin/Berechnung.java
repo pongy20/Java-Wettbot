@@ -12,6 +12,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -24,35 +25,29 @@ public class Berechnung {
 	static boolean exit = false;
 	
 	public static void main(String[] args) throws MalformedURLException, FileNotFoundException {
-//		PrintWriter pw = new PrintWriter(f);
-//		pw.print("");
-//		for(int j = 2000; j < 2020; j++) {
-//			for(int i = 1; i < 35; i++) {
-//				String s = "https://www.fussballdaten.de/bundesliga/";
-//				s = s + j + "/" + i + "/";
-//				URL url = new URL(s);
-//				flushDataFromHTMLtoCSV(url, f);
-//			}
-//		}
-//		flushMatchDay();
-//		readDataFromCSV(f, false);
-//		System.out.println("Unentschieden insgesamt: " + getRemis());
-//		System.out.println("Spiele insgesamt: " + getGames());
-//		System.out.printf("Wahrscheinlichkeit für ein Unentschieden insgesamt: %.2f\n", getProbability(getRemis(), getGames()));
-//		System.out.println();
-//		System.out.println("Wahrschienlichkeit für ein Unentschieden zwischen den Mannschaften:");
-//		String teamHomeName = "RB Leipzig";
-//		String teamAwayName = "Dortmund";
-//		System.out.println(teamHomeName + " und " + teamAwayName);
-//		System.out.printf("%.2f%%", getRemisQuoteInPercent(teamHomeName, teamAwayName));
-//		System.out.println();
-//		System.out.printf("Die Quote für diese Wahrscheinlichkeit beträgt: %.2f", getRemisQuote(teamHomeName, teamAwayName));
-		
-		
-		for(Match m : spieltag) {
-			System.out.println(m.getHomeTeam().getName());
+		PrintWriter pw = new PrintWriter(f);
+		pw.print("");
+		for(int j = 2000; j < 2020; j++) {
+			for(int i = 1; i < 35; i++) {
+				String s = "https://www.fussballdaten.de/bundesliga/";
+				s = s + j + "/" + i + "/";
+				URL url = new URL(s);
+				flushDataFromHTMLtoCSV(url, f);
+			}
 		}
-		calculateMatchDay();
+//		flushMatchDay();
+		readDataFromCSV(f, false);
+		System.out.println("Unentschieden insgesamt: " + getRemis());
+		System.out.println("Spiele insgesamt: " + getGames());
+		System.out.printf("Wahrscheinlichkeit für ein Unentschieden insgesamt: %.2f\n", getProbability(getRemis(), getGames()));
+		System.out.println();
+		System.out.println("Wahrschienlichkeit für ein Unentschieden zwischen den Mannschaften:");
+		String teamHomeName = "RB Leipzig";
+		String teamAwayName = "Dortmund";
+		System.out.println(teamHomeName + " und " + teamAwayName);
+		System.out.printf("%.2f%%", getRemisQuoteInPercent(teamHomeName, teamAwayName));
+		System.out.println();
+		System.out.printf("Die Quote für diese Wahrscheinlichkeit beträgt: %.2f", getRemisQuote(teamHomeName, teamAwayName));
 	}
 	
 	public static ArrayList<Match> getMatchList(){
@@ -71,11 +66,14 @@ public class Berechnung {
 				SimpleDateFormat df = new SimpleDateFormat("dd.MM.YYYY");
 				date = df.parse(teile[0]);
 				Team homeTeam = new Team(teile[1]);
-				Team awayTeam = new Team(teile[2]);
+				Team awayTeam = new Team(teile[3]);
 				Match match = new Match(homeTeam, awayTeam, null, date);
-				
-				if(teile.length > 6) {
-					for(int i = 3; i < teile.length - 3; i++) {
+				int homeGoals = Integer.parseInt(teile[2]);
+				int awayGoals = Integer.parseInt(teile[4]);
+				match.setHomeGoals(homeGoals);
+				match.setAwayGoals(awayGoals);
+				if(teile.length > 8) {
+					for(int i = 5; i < teile.length - 3; i++) {
 						int minute = Integer.parseInt(teile[i]);
 						i++;
 						if(homeTeam.getName().equals(teile[i])) {
@@ -112,8 +110,8 @@ public class Berechnung {
 			BufferedWriter bw = new BufferedWriter(fw);
 			SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
 			bw.append(df.format(match.getDate()).replace(";", ",") + ";");
-			bw.append(match.getHomeTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";");
-			bw.append(match.getAwayTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";");
+			bw.append(match.getHomeTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";" + match.getHomeGoals() + ";");
+			bw.append(match.getAwayTeam().getName().replace("&#039;", "önchen").replace(";", ",") + ";" + match.getAwayGoals() + ";");
 			for(Map.Entry<Player, List<Integer>> map : match.getGoalgetter().entrySet()) {
 				bw.append(map.getValue().get(0) + ";" + map.getKey().getTeam().getName().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getSurname().replace("&#039;", "önchen").replace(";", ",")  + ";" + map.getKey().getLastname().replace("&#039;", "önchen").replace(";", ",")  + ";");
 				for(int i = 1; i < map.getValue().size(); i++) {
@@ -149,6 +147,7 @@ public class Berechnung {
 			while(sc.hasNextLine()) {
 				line = sc.nextLine();
 				if(line.contains("<div class=\"spiele-details\"><div class=\"")) {
+//					System.out.println(line);
 					String[] teile = line.split(">");
 					for(int i = 0; i < teile.length; i++) {
 //						Match herausfiltern
@@ -158,6 +157,18 @@ public class Berechnung {
 							home = new Team(s[0]);
 							away = new Team(s[1]);
 							match = new Match(home, away, null, date);
+							
+							if(teile[i+2].contains(":")){
+								line = teile[i+2].substring(0, teile[i+2].indexOf("<"));
+								String[] tore = line.split(":");
+								int homeGoals = Integer.parseInt(tore[0]);
+								int awayGoals = Integer.parseInt(tore[1]);
+//								System.out.println(homeGoals);
+//								System.out.println(awayGoals);
+								match.setHomeGoals(homeGoals);
+								match.setAwayGoals(awayGoals);
+							}
+							
 						}
 						
 						
@@ -180,6 +191,9 @@ public class Berechnung {
 //							System.out.println("Date: " + date);
 						}
 						
+						if(teile[i].contains("title=\"Spieldetails: Duisburg gegen Leverkusen (13.08.1999, Bundesliga)\"") && teile[i+2].contains(":")) {
+							
+						}
 						
 //						Torschuetze herausfiltern
 						if(teile[i].contains("<div class=\"text-right")) {
@@ -188,10 +202,10 @@ public class Berechnung {
 								String[] name = line.split("-");
 								if(name.length >= 2) {
 									player = new Player(name[0], name[1], home);
-									System.out.println("Name: " + name[0] + " " + name[1]);
+//									System.out.println("Name: " + name[0] + " " + name[1]);
 								} else {
 									player = new Player("", name[0], home);
-									System.out.println("Name: " + name[0]);
+//									System.out.println("Name: " + name[0]);
 									
 								}
 								
@@ -202,10 +216,10 @@ public class Berechnung {
 								String[] name = line.split("-");
 								if(name.length >= 2) {
 									player = new Player(name[0], name[1], away); 
-									System.out.println("Name: " + name[0] + " " + name[1]);
+//									System.out.println("Name: " + name[0] + " " + name[1]);
 								} else {
 									player = new Player("", name[0], away);
-									System.out.println("Name: " + name[0]);
+//									System.out.println("Name: " + name[0]);
 									
 								}
 								
@@ -216,7 +230,7 @@ public class Berechnung {
 								line = teile[i-2].substring(0, teile[i-2].indexOf("'"));
 								minute = Integer.parseInt(line);
 								match.addGoalgetter(player, minute);
-								System.out.println("Tor in Minute: " + minute);
+//								System.out.println("Tor in Minute: " + minute);
 							}
 						}						
 					}
