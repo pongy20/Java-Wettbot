@@ -11,12 +11,17 @@ import de.wettbot.league.Country;
 public class Competition {
 	
 	private String name;
+	private int season , matchDay;
 	private Country country;
 	private ArrayList<Team> teams, tabelle;
 	
 	public Competition(String name, Country country) {
 		this.name = name;
 		this.country = country;
+		this.season = 0;
+		this.setMatchDayNumber(0);
+		this.teams = new ArrayList<Team>();
+		this.tabelle = new ArrayList<Team>();
 	}
 	
 	public String getName() {
@@ -46,35 +51,73 @@ public class Competition {
 	}
 	
 	public void fillTabelle() {
+		resetTabelle();
+		setSeason(getSeason() + 1);
 		for(int i = 0; i < 9; i++) {
-			resetTabell();
 			Team t1 = Berechnung.getMatchList().get(i).getHomeTeam();
 			Team t2 = Berechnung.getMatchList().get(i).getAwayTeam();
 			addTeam(t1);
 			addTeam(t2);
-			tabelle.add(t1);
-			tabelle.add(t2);
+		}
+		for(Team t : teams) {
+			tabelle.add(t);
 		}
 	}
 	
-	private void resetTabell() {
-		this.tabelle.removeAll(tabelle);
+	private void resetTabelle() {
+			this.tabelle.removeAll(tabelle);
 	}
 
-	public void sortTabelle() {
-		for(int i = 0; i < tabelle.size(); i++) {
-			int z = 0;
-			int x = 0;
-			int k = i;
-			while(k < tabelle.size()) {
-				int y = tabelle.get(k).getPoints();
-				if(x < y) {
-					z = k;
-					x = tabelle.get(k).getPoints();
+	public int getSeason() {
+		return season;
+	}
+
+	public void setSeason(int season) {
+		this.season = season;
+	}
+
+	public int getMatchDayNumber() {
+		return matchDay;
+	}
+
+	public void setMatchDayNumber(int matchDay) {
+		this.matchDay = matchDay;
+	}
+
+	public ArrayList<Team> getTeams() {
+		return teams;
+	}
+
+	public ArrayList<Team> getTabelle() {
+		return tabelle;
+	}
+	
+	public void startMatchday(int matchDayNumber) {
+		ArrayList<Match> matches = new ArrayList<Match>();
+		for(int k = 0; k < 9 * matchDayNumber; k++) {
+			matches.add(Berechnung.getMatchList().get(k));
+		}
+		for(Match m : matches) {
+			m.distributePoints();
+			Team t1 = m.getHomeTeam();
+			Team t2 = m.getAwayTeam();
+			for(Team t : teams) {
+				if(t.getName().equals(t1.getName())) {
+					t.setPoints(t.getPoints() + t1.getPoints());
+					break;
+				} else if(t.getName().equals(t2.getName())) {
+					t.setPoints(t.getPoints() + t2.getPoints());
 				}
-				k++;
 			}
-			tabelle.add(i, tabelle.get(z));
+		}
+	}
+	
+	public void outTabelle() {
+		String format = "%20s\t|\t%d\t| %5d\n";
+		System.out.printf("%20s\t| %6s %d\t|%8s\n", "1. Bundesliga", "Jahr", this.getSeason(), "Platz");
+		System.out.printf("%53s\n", "-----------------------------------------------");
+		for(int i = 0; i < this.getTabelle().size(); i++) {
+			System.out.printf(format, this.getTabelle().get(i).getName(), this.getTabelle().get(i).getPoints(), i + 1);
 		}
 	}
 }

@@ -1,23 +1,22 @@
 package de.wettbot;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.util.Collections;
+
+import de.wettbot.corvin.*;
 
 public class Wettbot {
+	
+	static File f = new File("src/SoccerDataBundesliga.csv");
+	
 	public static void main(String[] args) {
-		ArrayList<Integer> ints = new ArrayList<Integer>();
-		
-		int a = 1;
-		int b = 2;
-		int c = 3;
-		
-		ints.add(a);
-		ints.add(b);
-//		ints.add(c);
-		ints.add(0, c);
-//		ints.remove(3);
-		
-		for(int i : ints) {
-			System.out.println(i);
-		}
+		Competition bundesliga = new Competition("Bundesliga", null);
+		Berechnung.readDataFromCSV(f, false);
+		bundesliga.setSeason(1999);
+		bundesliga.fillTabelle();
+		bundesliga.startMatchday(1);
+//		bundesliga.startMatchday(2);
+		Collections.sort(bundesliga.getTabelle(), Collections.reverseOrder());
+		bundesliga.outTabelle();
 	}
 }
