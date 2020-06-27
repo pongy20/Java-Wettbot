@@ -2,6 +2,7 @@ package de.wettbot.corvin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -50,10 +51,8 @@ public class Competition {
 		return i;
 	}
 	
-	public int getPunkte(Team t) {
-		int punkte = 0;
-		
-		return punkte;
+	public int getPoints(Team t) {
+		return t.getPoints();
 	}
 	
 	public void fillTabelle() {
@@ -99,13 +98,42 @@ public class Competition {
 	}
 	
 	public void startMatchday(int matchDayNumber) {
-		ArrayList<Match> matches = new ArrayList<Match>();
-		for(int k = 0; k < 9 * matchDayNumber; k++) {
-			System.out.println(Berechnung.getMatchList().get(k).getHomeTeam().getName());
+		int i = 0;
+		ArrayList<Match> matches = Berechnung.getMatchList();
+		ArrayList<Team> teams = new ArrayList<Team>();
+		for(Match m : matches) {
+			if(i > (9 * matchDayNumber) - 1) {
+				break;
+			}
+			teams.add(m.getHomeTeam());
+			teams.add(m.getAwayTeam());
+			m.distributePoints();
+			System.out.println(m.getHomeTeam().getName() + " : " + m.getHomeGoals() + " | " + m.getAwayTeam().getName() + " : " + m.getAwayGoals());
+			if((i + 1) % 9 == 0) {
+				System.out.println("---------------------------------------------");
+			}
+			i++;
 		}
+		ArrayList<Team> temp = new ArrayList<>();
+		boolean bool = false;
+		for(int k = 0; k < teams.size(); k++) {
+			for(int j = 0; j < temp.size(); j++) {
+				if(teams.get(k).getName().equals((temp.get(j).getName()))) {
+					bool = true;
+					temp.get(j).setPoints(temp.get(j).getPoints() + teams.get(k).getPoints());
+				}
+			}
+			if(!bool) {
+				temp.add(teams.get(k));
+			}
+		}
+		teams.removeAll(teams);
+		teams.addAll(temp);
+		temp.removeAll(temp);
 	}
 	
 	public void outTabelle() {
+		Collections.sort(this.getTabelle(), Collections.reverseOrder());
 		String format = "%20s\t|\t%d\t| %5d\n";
 		System.out.printf("%20s\t| %6s %d\t|%8s\n", "1. Bundesliga", "Jahr", this.getSeason(), "Platz");
 		System.out.printf("%53s\n", "-----------------------------------------------");

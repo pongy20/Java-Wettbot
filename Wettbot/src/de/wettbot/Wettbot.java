@@ -20,40 +20,14 @@ public class Wettbot {
 //		}
 //		bundesliga.startMatchday(1);
 //		bundesliga.startMatchday(2);
-//		
-//		
-		int i = 0;
-		ArrayList<Match> matches = Berechnung.getMatchList();
-		ArrayList<Team> teams = new ArrayList<Team>();
-		for(Match m : matches) {
-			if(i > 26) {
-				break;
-			}
-			teams.add(m.getHomeTeam());
-			teams.add(m.getAwayTeam());
-			m.distributePoints();
-			System.out.println(m.getHomeTeam().getName() + " : " + m.getHomeTeam().getPoints() + " | " + m.getAwayTeam().getName() + " : " + m.getAwayTeam().getPoints());
-			if((i + 1) % 9 == 0) {
-				System.out.println("---------------------------------------------");
-			}
-			i++;
-		}
-		ArrayList<Team> temp = new ArrayList<>();
-		boolean bool = false;
-		for(int k = 0; k < teams.size(); k++) {
-			for(int j = 0; j < temp.size(); j++) {
-				if(teams.get(k).getName().equals((temp.get(j).getName()))) {
-					bool = true;
-					temp.get(j).setPoints(temp.get(j).getPoints() + teams.get(k).getPoints());
-				}
-			}
-			if(!bool) {
-				temp.add(teams.get(k));
-			}
-		}
-		teams.removeAll(teams);
-		teams.addAll(temp);
-		Collections.sort(bundesliga.getTabelle(), Collections.reverseOrder());
+		int matchDayNumber = 34;
+//		bundesliga.calculateTabelle(matchDayNumber);
+		bundesliga.startMatchday(matchDayNumber);
 		bundesliga.outTabelle();
+		
+//		for(Team t : bundesliga.getTabelle()) {
+//			System.out.println(t.getName() + " : " + t.getPoints());
+//		}
+		
 	}
 }
