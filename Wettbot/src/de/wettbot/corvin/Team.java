@@ -4,6 +4,7 @@ public class Team implements Comparable<Team>{
 
 	private String name;
 	private int aktPunkte;
+	private int number;
 
 	public Team(String name) {
 		this.setName(name);
@@ -32,6 +33,14 @@ public class Team implements Comparable<Team>{
 		} else {
 			return -1;
 		}
+	}
+
+	public void setNumber(int number) {
+		this.number = number;
+	}
+
+	public int getNumber() {
+		return number;
 	}
 
 }

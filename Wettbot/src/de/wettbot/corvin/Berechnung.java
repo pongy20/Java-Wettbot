@@ -93,6 +93,7 @@ public class Berechnung {
 				} else {
 					matchList.add(match);
 				}
+				
 			}
 			
 			sc.close();
