@@ -25,29 +25,78 @@ public class Berechnung {
 	static boolean exit = false;
 	
 	public static void main(String[] args) throws MalformedURLException, FileNotFoundException {
-		PrintWriter pw = new PrintWriter(f);
-		pw.print("");
-		for(int j = 2000; j < 2020; j++) {
-			for(int i = 1; i < 35; i++) {
-				String s = "https://www.fussballdaten.de/bundesliga/";
-				s = s + j + "/" + i + "/";
-				URL url = new URL(s);
-				flushDataFromHTMLtoCSV(url, f);
-			}
-		}
+//		PrintWriter pw = new PrintWriter(f);
+//		pw.print("");
+//		for(int j = 2000; j < 2020; j++) {
+//			for(int i = 1; i < 35; i++) {
+//				String s = "https://www.fussballdaten.de/bundesliga/";
+//				s = s + j + "/" + i + "/";
+//				URL url = new URL(s);
+//				flushDataFromHTMLtoCSV(url, f);
+//			}
+//		}
 //		flushMatchDay();
-		readDataFromCSV(f, false);
-		System.out.println("Unentschieden insgesamt: " + getRemis());
-		System.out.println("Spiele insgesamt: " + getGames());
-		System.out.printf("Wahrscheinlichkeit für ein Unentschieden insgesamt: %.2f\n", getProbability(getRemis(), getGames()));
-		System.out.println();
-		System.out.println("Wahrschienlichkeit für ein Unentschieden zwischen den Mannschaften:");
-		String teamHomeName = "RB Leipzig";
-		String teamAwayName = "Dortmund";
-		System.out.println(teamHomeName + " und " + teamAwayName);
-		System.out.printf("%.2f%%", getRemisQuoteInPercent(teamHomeName, teamAwayName));
-		System.out.println();
-		System.out.printf("Die Quote für diese Wahrscheinlichkeit beträgt: %.2f", getRemisQuote(teamHomeName, teamAwayName));
+//		readDataFromCSV(f, false);
+//		System.out.println("Unentschieden insgesamt: " + getRemis());
+//		System.out.println("Spiele insgesamt: " + getGames());
+//		System.out.printf("Wahrscheinlichkeit für ein Unentschieden insgesamt: %.2f\n", getProbability(getRemis(), getGames()));
+//		System.out.println();
+//		System.out.println("Wahrschienlichkeit für ein Unentschieden zwischen den Mannschaften:");
+//		String teamHomeName = "RB Leipzig";
+//		String teamAwayName = "Dortmund";
+//		System.out.println(teamHomeName + " und " + teamAwayName);
+//		System.out.printf("%.2f%%", getRemisQuoteInPercent(teamHomeName, teamAwayName));
+//		System.out.println();
+//		System.out.printf("Die Quote für diese Wahrscheinlichkeit beträgt: %.2f", getRemisQuote(teamHomeName, teamAwayName));
+	}
+	
+	public static ArrayList<Player> flushPlayerToCSV(ArrayList<Team> teams) {
+		
+			try {
+				URL url = new URL("https://www.weltfussball.de/spielerliste/bundesliga-2000-2001/nach-name/1/");
+				BufferedInputStream bis = new BufferedInputStream(url.openStream());
+				Scanner sc = new Scanner(bis, "UTF-8");
+				String line = null;
+				ArrayList<Player> player = new ArrayList<Player>();
+				while(sc.hasNextLine()) {
+					line = sc.nextLine();
+//					System.out.println(line);
+					Player p = null;
+					if(line.contains("/spieler_profil/")) {
+						String subline = line.substring(line.indexOf("/\">") + 3, line.indexOf("</a>"));
+						String[] names = subline.split(" ");
+						System.out.println(names[0]);
+						if(names.length == 1) {
+							p = new Player("", names[0], null);
+						} else {
+							p = new Player(names[0], names[1], null);
+						}
+					} else if(line.contains("\"><a href=\"/teams/")) {
+						String subline = line.substring(line.indexOf("/\">") + 3, line.indexOf("</a>"));
+						for(int i = 0; i < teams.size(); i++) {
+							System.out.println(subline);
+							if(subline.contains(teams.get(i).getName())) {
+								Team t = teams.get(i);
+								if(p != null) {
+									
+									p.setTeam(t);
+									player.add(p);
+								}
+							}
+						}
+					}
+					
+				}
+				sc.close();
+				return player;
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+				return null;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+			
 	}
 	
 	public static ArrayList<Match> getMatchList(){

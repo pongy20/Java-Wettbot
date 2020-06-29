@@ -15,6 +15,7 @@ public class Wettbot {
 	static File f = new File("src/SoccerDataBundesliga.csv");
 	static ArrayList<Team> teams = new ArrayList<Team>();
 	static ArrayList<String> namen = new ArrayList<String>();
+	static ArrayList<Player> player = new ArrayList<Player>();
 	
 	static ArrayList<Match> matches = Berechnung.getMatchList();
 	static InputNeuron[] inputNeurons = new InputNeuron[5];
@@ -25,16 +26,13 @@ public class Wettbot {
 	public static void main(String[] args) {
 		Competition bundesliga = new Competition("Bundesliga", null);
 		bundesliga.setSeason(2000);
-		
-		useBot(bundesliga, 10);
-		
-//		Berechnung.readDataFromCSV(f, false);
-//		fillTeams();
-//		int i = 0;
-//		while(i < teams.size()) {
-//			i++;
-//		}
-//		System.out.println(i);
+		fillTeams();
+		player.addAll(Berechnung.flushPlayerToCSV(teams));
+		for(Player p : player) {
+			System.out.println(p.getTeam().getName() + " " + p.getLastname() + " " + p.getSurname());
+		}
+		System.out.println(player.size());
+//		useBot(bundesliga, 10);
 	}
 	
 	public static void fillTeams() {
@@ -44,12 +42,12 @@ public class Wettbot {
 			Team away = m.getAwayTeam();
 //			System.out.println(home.getName() + " " + home.getPoints() + " : " + away.getPoints() + " "	 + away.getName());
 			if(!namen.contains(home.getName())) {
-				home.setNumber(teams.size());
+				home.setNumber(teams.size() + 1);
 				teams.add(home);
 				namen.add(home.getName());
 			}
 			if(!namen.contains(away.getName())) {
-				away.setNumber(teams.size());
+				away.setNumber(teams.size() + 1);
 				teams.add(away);
 				namen.add(away.getName());
 			}
@@ -61,8 +59,8 @@ public class Wettbot {
 		int hiddenNeuronNumber = 3;
 		Random rand = new Random();
 		float[] weights = new float[inputNeurons.length * hiddenNeuronNumber + hiddenNeuronNumber * outputNeurons.length];
-		float epsilon = 0.005f;
-		float percentage = 0f;
+		float epsilon = 0.0005f;
+		
 		
 		for(int i = 0; i < inputNeurons.length; i++) {
 			inputNeurons[i] = nn.createNewInput();
@@ -77,116 +75,132 @@ public class Wettbot {
 		}
 		nn.createFullMesh(weights);
 		
-		int n = 0;
-		int i = 0;
-		int z = 0;
-		while(n < years) {
-			System.out.println(wettbewerb.getSeason());
-			percentage = test(years);
-			for(int nu = 0; nu < tabelle.length; nu++) {
-				tabelle[nu] = null;
-			}
-			while(z < (n+1) * 34) {
-				int j = 0;
-				while(i < (z+1) * 9){
-					Match m = matches.get(i);
-					boolean a = false, b = false;
-					for(Team t : tabelle) {
-						if(t == null) {
-							
-						} else if(t.getName().equals(m.getHomeTeam().getName())) {
-							a = true;
-						} else if(t.getName().equals(m.getAwayTeam().getName())) {
-							b = true;
-						}
-					}
-					if(!a) {
-						tabelle[j] = m.getHomeTeam();
-						j++;
-					}
-					if(!b) {
-						tabelle[j] = m.getAwayTeam();
-						j++;
-					}
-					if(m.getHomeGoals() == m.getAwayGoals()) {
-						for(int te = 0; te < tabelle.length; te++) {
-							if(tabelle[te] == null) {
-								
-							} else if(tabelle[te].getName().equals(m.getHomeTeam().getName())) {
-								tabelle[te].setPoints(tabelle[te].getPoints() + 1);
-							} else if(tabelle[te].getName().equals(m.getAwayTeam().getName())) {
-								tabelle[te].setPoints(tabelle[te].getPoints() + 1);
-							}
-						}
-					} else if(m.getHomeGoals() > m.getAwayGoals()) {
-						for(int te = 0; te < tabelle.length; te++) {
-							if(tabelle[te] == null) {
-								
-							} else if(tabelle[te].getName().equals(m.getHomeTeam().getName())) {
-								tabelle[te].setPoints(tabelle[te].getPoints() + 3);
-							}
-						}
-					} else {
-						for(int te = 0; te < tabelle.length; te++) {
-							if(tabelle[te] == null) {
-								
-							} else if(tabelle[te].getName().equals(m.getAwayTeam().getName())) {
-								tabelle[te].setPoints(tabelle[te].getPoints() + 1);
-							}
-						}
-					}
-					
-					for(int te = 0; te < teams.size(); te++) {
-						for(int k = 0; k < tabelle.length; k++) {
-							if(tabelle[k] ==  null) {
-								
-							} else if(tabelle[k].getName().equals(teams.get(te).getName())) {
-								tabelle[k].setNumber(teams.get(te).getNumber());
-							}
-						}
-					}
-					
-					int x = 0, y = 0, numX = 0, numY = 0;
-					for(int k = 0; k < tabelle.length; k++) {
-						if(tabelle[k] == null) {
-							
-						} else if(tabelle[k].getName().equals(m.getHomeTeam().getName())) {
-							x = k;
-							numX = tabelle[k].getNumber();
-						} else if(tabelle[k].getName().equals(m.getAwayTeam().getName())) {
-							y = k;
-							numY = tabelle[k].getNumber();
-						}
-					}
-					inputNeurons[0].setValue((z % 34) + 1);
-					inputNeurons[1].setValue(numX);
-					inputNeurons[2].setValue(x);
-					inputNeurons[3].setValue(numY);
-					inputNeurons[4].setValue(y);
-					float[] shoulds = new float[outputNeurons.length];
-					if(m.getHomeGoals() == m.getAwayGoals()) {
-						shoulds[0] = 1;
-					} else if(m.getHomeGoals() > m.getAwayGoals()) {
-						shoulds[1] = 1;
-					} else {
-						shoulds[2] = 1;
-					}
-					nn.backpropagation(shoulds, epsilon);
-					
-					
-					i++;
+		while(true) {
+			int n = 0;
+			int i = 0;
+			int z = 0;
+			test(years);
+			while(n < years) {
+//				System.out.println(wettbewerb.getSeason());
+				for(int nu = 0; nu < tabelle.length; nu++) {
+					tabelle[nu] = null;
 				}
-				z++;
+				while(z < (n+1) * 34) {
+					int j = 0;
+					while(i < (z+1) * 9){
+						Match m = matches.get(i);
+						boolean a = false, b = false;
+						for(Team t : tabelle) {
+							if(t == null) {
+								
+							} else if(t.getName().equals(m.getHomeTeam().getName())) {
+								a = true;
+							} else if(t.getName().equals(m.getAwayTeam().getName())) {
+								b = true;
+							}
+						}
+						if(!a) {
+							tabelle[j] = m.getHomeTeam();
+							j++;
+						}
+						if(!b) {
+							tabelle[j] = m.getAwayTeam();
+							j++;
+						}
+						if(m.getHomeGoals() == m.getAwayGoals()) {
+							for(int te = 0; te < tabelle.length; te++) {
+								if(tabelle[te] == null) {
+									
+								} else if(tabelle[te].getName().equals(m.getHomeTeam().getName())) {
+									tabelle[te].setPoints(tabelle[te].getPoints() + 1);
+								} else if(tabelle[te].getName().equals(m.getAwayTeam().getName())) {
+									tabelle[te].setPoints(tabelle[te].getPoints() + 1);
+								}
+							}
+						} else if(m.getHomeGoals() > m.getAwayGoals()) {
+							for(int te = 0; te < tabelle.length; te++) {
+								if(tabelle[te] == null) {
+									
+								} else if(tabelle[te].getName().equals(m.getHomeTeam().getName())) {
+									tabelle[te].setPoints(tabelle[te].getPoints() + 3);
+								}
+							}
+						} else {
+							for(int te = 0; te < tabelle.length; te++) {
+								if(tabelle[te] == null) {
+									
+								} else if(tabelle[te].getName().equals(m.getAwayTeam().getName())) {
+									tabelle[te].setPoints(tabelle[te].getPoints() + 1);
+								}
+							}
+						}
+						
+						for(int te = 0; te < teams.size(); te++) {
+							for(int k = 0; k < tabelle.length; k++) {
+								if(tabelle[k] ==  null) {
+									
+								} else if(tabelle[k].getName().equals(teams.get(te).getName())) {
+									tabelle[k].setNumber(teams.get(te).getNumber());
+								}
+							}
+						}
+						
+						int x = 0, y = 0, numX = 0, numY = 0;
+						for(int k = 0; k < tabelle.length; k++) {
+							if(tabelle[k] == null) {
+								
+							} else if(tabelle[k].getName().equals(m.getHomeTeam().getName())) {
+								x = k + 1;
+								numX = tabelle[k].getNumber();
+							} else if(tabelle[k].getName().equals(m.getAwayTeam().getName())) {
+								y = k + 1;
+								numY = tabelle[k].getNumber();
+							}
+						}
+						inputNeurons[0].setValue((float)((float)(z % 34) + 1) / 34f);
+						inputNeurons[1].setValue((float)numX / (float)teams.size());
+						inputNeurons[2].setValue((float)x / (float)tabelle.length);
+						inputNeurons[3].setValue((float)numY /(float) teams.size());
+						inputNeurons[4].setValue((float)y / (float)tabelle.length);
+						for(InputNeuron in : inputNeurons) {
+							System.out.println("InputWert: " + in.getValue());
+						}
+						System.out.println();
+						float[] shoulds = new float[outputNeurons.length];
+						if(m.getHomeGoals() == m.getAwayGoals()) {
+							shoulds[0] = 1;
+						} else if(m.getHomeGoals() > m.getAwayGoals()) {
+							shoulds[1] = 1;
+						} else {
+							shoulds[2] = 1;
+						}
+						nn.backpropagation(shoulds, epsilon);
+						
+						for(int fl = 0; fl < outputNeurons.length; fl++) {
+							System.out.println("Output[" + fl + "] " + outputNeurons[fl].getValue());
+						}
+						System.out.println();
+						if(i == 50) {
+							return;
+						}
+						i++;
+						epsilon = epsilon * 0.9f;
+					}
+					z++;
+				}
+				n++;
+				Arrays.sort(tabelle, Collections.reverseOrder());
+//				System.out.println(outputNeurons[0].getValue());
+//				System.out.println(outputNeurons[1].getValue());
+//				System.out.println(outputNeurons[2].getValue());
+//				System.out.println("______________________");
+	//			System.out.println(wettbewerb.getSeason());
+	//			for(Team t : tabelle) {
+	//				System.out.println(t.getName());
+	//			}
+	//			System.out.println();
+				wettbewerb.setSeason(2000 + n);
 			}
-			n++;
-			Arrays.sort(tabelle, Collections.reverseOrder());
-//			System.out.println(wettbewerb.getSeason());
-//			for(Team t : tabelle) {
-//				System.out.println(t.getName());
-//			}
-//			System.out.println();
-			wettbewerb.setSeason(2000 + n);
-				
 		}
 	}
 		
@@ -208,6 +222,7 @@ public class Wettbot {
 				
 				int j = 0;
 				while(i < (z+1) * 9){
+					nn.reset();
 					Match m = matches.get(i);
 					boolean a = false, b = false;
 					for(Team t : tabelle) {
@@ -278,23 +293,29 @@ public class Wettbot {
 						}
 					}
 					
-					inputNeurons[0].setValue((z % 34) + 1);
-					inputNeurons[1].setValue(numX);
-					inputNeurons[2].setValue(x);
-					inputNeurons[3].setValue(numY);
-					inputNeurons[4].setValue(y);
+					inputNeurons[0].setValue((float)((float)(z % 34) + 1) / 34f);
+					inputNeurons[1].setValue((float)numX / (float)teams.size());
+					inputNeurons[2].setValue((float)x / (float)tabelle.length);
+					inputNeurons[3].setValue((float)numY /(float) teams.size());
+					inputNeurons[4].setValue((float)y / (float)tabelle.length);
 					
 					ProbabilityDigit[] probs = new ProbabilityDigit[3];
 					for(int k = 0; k < probs.length; k++) {
 						probs[k] = new ProbabilityDigit(k, outputNeurons[k].getValue());
 					}
-					Arrays.sort(probs);
+					Arrays.sort(probs, Collections.reverseOrder());
 					boolean wasCorrect = false;
 					for(int k = 0; k < 1; k++) {
 						if((m.getHomeGoals() == m.getAwayGoals() && probs[k].DIGIT == 0) || (m.getHomeGoals() > m.getAwayGoals() && probs[k].DIGIT == 1) || (m.getHomeGoals() < m.getAwayGoals() && probs[k].DIGIT == 0)) {
 							wasCorrect = true;
+//							System.out.println("true");
 						}
 					}
+//					for(int k = 0; k < outputNeurons.length; k++) {
+//						System.out.println(outputNeurons[k].getValue());
+//						System.out.println(probs[k].DIGIT);
+//					}
+//					System.out.println();
 					
 					if(wasCorrect) {
 						correct++;

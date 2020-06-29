@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class OutputNeuron extends Neuron{
 
 	private List<Connection> connections = new ArrayList<>();
-	private ActivationFunction activationFunktion = ActivationFunction.sigmoid;
+	private ActivationFunction activationFunktion = ActivationFunction.hyperbol;
 	private float smallDelta = 0;
 	private float value = 0;
 	private boolean bool = false;
@@ -49,6 +49,7 @@ public class OutputNeuron extends Neuron{
 	
 	public void calculateOutputDelta(float should) {
 		smallDelta = should - getValue();
+//		System.out.println("Should " + should + " - Ist " + getValue() + " = smallDelta " + smallDelta);
 	}
 	
 	public void backPropagate() {
@@ -56,7 +57,9 @@ public class OutputNeuron extends Neuron{
 			Neuron n = c.getNeuron();
 			if(n instanceof OutputNeuron) {
 				OutputNeuron on = (OutputNeuron) n;
+//				System.out.println("SmallDelta * Weight " + smallDelta + " * " + c.getWeight() + " + " + on.smallDelta);
 				on.smallDelta += this.smallDelta * c.getWeight();
+//				System.out.println("= " + on.smallDelta);
 			}
 		}
 	}
