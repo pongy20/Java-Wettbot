@@ -62,7 +62,6 @@ public class Competition {
 	}
 
 	public void setSeason(int season) {
-		resetTabelle();
 		this.season = season;
 	}
 

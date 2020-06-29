@@ -40,21 +40,6 @@ public class Match {
 		goalMinutes = new ArrayList<Integer>();
 		playerCards = new TreeMap<Player, Card>();
 	}
-	
-	public void distributePoints() {
-		if(this.getAwayGoals() == this.getHomeGoals()) {
-			Team t2 = getAwayTeam();
-			Team t1 = getHomeTeam();
-			t1.setPoints(t1.getPoints() + 1);
-			t2.setPoints(t2.getPoints() + 1);
-		} else if(this.getHomeGoals() > this.getAwayGoals()) {
-			Team t1 = getHomeTeam();
-			t1.setPoints(t1.getPoints() + 3);
-		} else {
-			Team t2 = getAwayTeam();
-			t2.setPoints(t2.getPoints() + 3);
-		}
-	}
 
 	public void addGoalgetter(Player player, int minute) {
 		goalMinutes.add(minute);

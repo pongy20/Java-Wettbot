@@ -2,8 +2,8 @@ package de.wettbot.corvin;
 
 public class Team implements Comparable<Team>{
 
+	private int points;
 	private String name;
-	private int aktPunkte;
 	private int number;
 
 	public Team(String name) {
@@ -18,29 +18,29 @@ public class Team implements Comparable<Team>{
 		this.name = name;
 	}
 
-	public void setPoints(int points) {
-		this.aktPunkte = points;
-	}
-
-	public int getPoints() {
-		return this.aktPunkte;
-	}
-
-	@Override
-	public int compareTo(Team o) {
-		if(this.getPoints() >= o.getPoints()) {
-			return 1;
-		} else {
-			return -1;
-		}
-	}
-
 	public void setNumber(int number) {
 		this.number = number;
 	}
 
 	public int getNumber() {
 		return number;
+	}
+
+	public int getPoints() {
+		return points;
+	}
+
+	public void setPoints(int points) {
+		this.points = points;
+	}
+
+	@Override
+	public int compareTo(Team o) {
+		if(this.getPoints() > o.getPoints()) {
+			return 1;
+		} else {
+			return -1;
+		}
 	}
 
 }
